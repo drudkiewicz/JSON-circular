@@ -1,3 +1,6 @@
+# Installation
+`npm install simple-json-circular`
+
 # JSON.encodeCirculars
 Replaces circular references with JSON path to the first occurence of the object.
 
@@ -30,7 +33,6 @@ undefined
 > JSON.decodeCirculars(myArray)
 [ 12, 'abc', [Circular] ]
 ```
-
 
 ## Tests
 - ```npm install``` To install all dependencies

@@ -1,12 +1,17 @@
 {
-  "name": "JSON-circular",
-  "version": "1.0.0",
+  "name": "simple-json-circular",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "mocha encodeDecodeCirculars.test"
   },
   "author": "daria.rudkiewicz",
+  "repository" :
+  {
+    "type" : "git",
+    "url" : "https://github.com/drudkiewicz/JSON-circular"
+  },
   "license": "ISC",
   "dependencies": {
     "chai": "^4.1.2",
