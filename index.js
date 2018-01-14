@@ -10,86 +10,86 @@ const isPrimitiveValue = (value) => (
 );
 
 JSON.encodeCirculars = (obj) => {
-	const walkObject = (currentValue) => {
-		const replaceCircular = (val, key) => {
-			const circularObjectPath = map.get(val);
+    const walkObject = (currentValue) => {
+        const replaceCircular = (val, key) => {
+            const circularObjectPath = map.get(val);
 
-			if (circularObjectPath) {
-				return { $ref: circularObjectPath };
-			} else if (typeof val === 'object') {
-				map.set(val, `${map.get(currentValue)}.${key}`);
-				return walkObject(val);
-			}
+            if (circularObjectPath) {
+                return { $ref: circularObjectPath };
+            } else if (typeof val === 'object') {
+                map.set(val, `${map.get(currentValue)}.${key}`);
+                return walkObject(val);
+            }
 
-			return val;
-		};
+            return val;
+        };
 
-		if (Array.isArray(currentValue)) {
-			return currentValue.map(replaceCircular);
-		} else if (!isPrimitiveValue(obj)) {
-			const copy = Object.assign({}, currentValue);
-			Object.keys(currentValue).forEach((key) => {
-				const val = currentValue[key];
-				copy[key] = replaceCircular(val, key);
-			});
+        if (Array.isArray(currentValue)) {
+            return currentValue.map(replaceCircular);
+        } else if (!isPrimitiveValue(obj)) {
+            const copy = Object.assign({}, currentValue);
+            Object.keys(currentValue).forEach((key) => {
+                const val = currentValue[key];
+                copy[key] = replaceCircular(val, key);
+            });
 
-			return copy;
-		}
+            return copy;
+        }
 
-		return currentValue;
-	};
+        return currentValue;
+    };
 
-	if (isPrimitiveValue(obj)) {
-		return obj;
-	}
+    if (isPrimitiveValue(obj)) {
+        return obj;
+    }
 
-	const map = new WeakMap();
+    const map = new WeakMap();
 
-	map.set(obj, '$');
+    map.set(obj, '$');
 
-	return walkObject(obj);
+    return walkObject(obj);
 };
 
 JSON.decodeCirculars = function (encodedObj) {
-	const walkObject = (currentValue) => {
-		const replaceRef = (val, key) => {
-			const ref = val.$ref;
+    const walkObject = (currentValue) => {
+        const replaceRef = (val, key) => {
+            const ref = val.$ref;
 
-			if (ref) {
-				if (ref === '$') {
-					currentValue[key] = encodedObj;
-				} else {
-					const pathParts = ref.split('.');
+            if (ref) {
+                if (ref === '$') {
+                    currentValue[key] = encodedObj;
+                } else {
+                    const pathParts = ref.split('.');
 
-					const referencedObj = pathParts.reduce((acc, val, i) => {
-						if (i === 0) return acc;
+                    const referencedObj = pathParts.reduce((acc, val, i) => {
+                        if (i === 0) return acc;
 
-						return acc[val];
-					}, encodedObj);
+                        return acc[val];
+                    }, encodedObj);
 
-					currentValue[key] = referencedObj;
-				}
-			} else {
-				walkObject(val);
-			}
-		};
+                    currentValue[key] = referencedObj;
+                }
+            } else {
+                walkObject(val);
+            }
+        };
 
-		if (Array.isArray(currentValue)) {
-			return currentValue.map(replaceRef);
-		} else if (!isPrimitiveValue(currentValue)) {
-			Object.keys(currentValue).forEach((key) => {
-				const val = currentValue[key];
+        if (Array.isArray(currentValue)) {
+            return currentValue.map(replaceRef);
+        } else if (!isPrimitiveValue(currentValue)) {
+            Object.keys(currentValue).forEach((key) => {
+                const val = currentValue[key];
 
-				if (typeof val === 'object') {
-					replaceRef(val, key);
-				}
-			});
-		}
-	};
+                if (typeof val === 'object') {
+                    replaceRef(val, key);
+                }
+            });
+        }
+    };
 
-	if (!isPrimitiveValue(encodedObj)) {
-		walkObject(encodedObj);
-	}
+    if (!isPrimitiveValue(encodedObj)) {
+        walkObject(encodedObj);
+    }
 
-	return encodedObj;
+    return encodedObj;
 };
